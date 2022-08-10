@@ -1,151 +1,41 @@
 #include "shell.h"
-int shellby_alias(char **args, char __attribute__((__unused__)) **front);
-void set_alias(char *var_name, char *value);
-void print_alias(alias_t *alias);
+
 
 /**
- * shellby_alias - Builtin command that either prints all aliases, specific
- * aliases, or sets an alias.
- * @args: An array of arguments.
- * @front: A double pointer to the beginning of args.
- *
- * Return: If an error occurs - -1.
- *         Otherwise - 0.
+ * aux_help - Help information for the builtin help.
+ * Return: no return
  */
-int shellby_alias(char **args, char __attribute__((__unused__)) **front)
+void aux_help(void)
 {
-	alias_t *temp = aliases;
-	int i, ret = 0;
-	char *value;
+	char *help = "help: help [-dms] [pattern ...]\n";
 
-	if (!args[0])
-	{
-		while (temp)
-		{
-			print_alias(temp);
-			temp = temp->next;
-		}
-		return (ret);
-	}
-	for (i = 0; args[i]; i++)
-	{
-		temp = aliases;
-		value = _strchr(args[i], '=');
-		if (!value)
-		{
-			while (temp)
-			{
-				if (_strcmp(args[i], temp->name) == 0)
-				{
-					print_alias(temp);
-					break;
-				}
-				temp = temp->next;
-			}
-			if (!temp)
-				ret = create_error(args + i, 1);
-		}
-		else
-			set_alias(args[i], value);
-	}
-	return (ret);
-}
-
-/**
- * set_alias - Will either set an existing alias 'name' with a new value,
- * 'value' or creates a new alias with 'name' and 'value'.
- * @var_name: Name of the alias.
- * @value: Value of the alias. First character is a '='.
- */
-void set_alias(char *var_name, char *value)
-{
-	alias_t *temp = aliases;
-	int len, j, k;
-	char *new_value;
-
-	*value = '\0';
-	value++;
-	len = _strlen(value) - _strspn(value, "'\"");
-	new_value = malloc(sizeof(char) * (len + 1));
-	if (!new_value)
-		return;
-	for (j = 0, k = 0; value[j]; j++)
-	{
-		if (value[j] != '\'' && value[j] != '"')
-			new_value[k++] = value[j];
-	}
-	new_value[k] = '\0';
-	while (temp)
-	{
-		if (_strcmp(var_name, temp->name) == 0)
-		{
-			free(temp->value);
-			temp->value = new_value;
-			break;
-		}
-		temp = temp->next;
-	}
-	if (!temp)
-		add_alias_end(&aliases, var_name, new_value);
-}
-
-/**
- * print_alias - Prints the alias in the format name='value'.
- * @alias: Pointer to an alias.
- */
-void print_alias(alias_t *alias)
-{
-	char *alias_string;
-	int len = _strlen(alias->name) + _strlen(alias->value) + 4;
-
-	alias_string = malloc(sizeof(char) * (len + 1));
-	if (!alias_string)
-		return;
-	_strcpy(alias_string, alias->name);
-	_strcat(alias_string, "='");
-	_strcat(alias_string, alias->value);
-	_strcat(alias_string, "'\n");
-
-	write(STDOUT_FILENO, alias_string, len);
-	free(alias_string);
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "\tDisplay information about builtin commands.\n ";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Displays brief summaries of builtin commands.\n";
+	write(STDOUT_FILENO, help, _strlen(help));
 }
 /**
- * replace_aliases - Goes through the arguments and replace any matching alias
- * with their value.
- * @args: 2D pointer to the arguments.
- *
- * Return: 2D pointer to the arguments.
+ * aux_help_alias - Help information for the builtin alias.
+ * Return: no return
  */
-char **replace_aliases(char **args)
+void aux_help_alias(void)
 {
-	alias_t *temp;
-	int i;
-	char *new_value;
+	char *help = "alias: alias [-p] [name[=value]...]\n";
 
-	if (_strcmp(args[0], "alias") == 0)
-		return (args);
-	for (i = 0; args[i]; i++)
-	{
-		temp = aliases;
-		while (temp)
-		{
-			if (_strcmp(args[i], temp->name) == 0)
-			{
-				new_value = malloc(sizeof(char) * (_strlen(temp->value) + 1));
-				if (!new_value)
-				{
-					free_args(args, args);
-					return (NULL);
-				}
-				_strcpy(new_value, temp->value);
-				free(args[i]);
-				args[i] = new_value;
-				i--;
-				break;
-			}
-			temp = temp->next;
-		}
-	}
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "\tDefine or display aliases.\n ";
+	write(STDOUT_FILENO, help, _strlen(help));
+}
+/**
+ * aux_help_cd - Help information for the builtin alias.
+ * Return: no return
+ */
+void aux_help_cd(void)
+{
+	char *help = "cd: cd [-L|[-P [-e]] [-@]] [dir]\n";
 
-	return (args);
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "\tChange the shell working directory.\n ";
+	write(STDOUT_FILENO, help, _strlen(help));
 }
